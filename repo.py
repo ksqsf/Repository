@@ -3,6 +3,7 @@
 import subprocess
 import queue
 import urllib.parse
+from selenium import webdriver
 
 class Handler(object):
     def __init__(self, name):
@@ -45,8 +46,15 @@ class WebPage(Handler):
         return "/tmp/1.mhtml"
 
     def try_archive(self, rri: str):
-        print('todo(webpage): archive rri: ' + rri)
-        pass
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(options=options)
+        driver.get(rri)
+        res = driver.execute_cdp_cmd('Page.captureSnapshot', {})
+        with open(self.local_path(rri), 'w', newline='') as f:
+            f.write(res['data'])
+        driver.quit()
+        # mhtml from chrome is only recognized by chrome...
 
 
 class BilibiliVideo(Handler):
@@ -70,7 +78,7 @@ class BilibiliVideo(Handler):
 
     def discover(self, upper_rri: str):
         res = urllib.parse.urlparse(upper_rri)
-        if res.scheme in ['http', 'https']:
+        if (res.scheme in ['http', 'https']) and ('bilibili' in res.netloc):
             return ['bilibili:video:' + res.path.split('/')[-1]]
         else:
             return []
@@ -124,6 +132,7 @@ class Resource:
         return resources
 
 Resource('https://www.bilibili.com/video/BV1gU4y187xA').archive()
+Resource('https://zhuanlan.zhihu.com/p/455688955').archive()
 
 def pr(res, d=0):
     print('\t' * d, end='')
