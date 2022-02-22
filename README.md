@@ -1,28 +1,27 @@
 # Repository
 
-Repository is a personalized, open platform to save and query Web pages and associated resources.
+**Repository** (or Repo for short) is an open, extensible, and fast **personal object store** with rich metadata support and a versatile query language.
 
-Repository is not possible without awesome existing projects: youtube-dl, 
+**Current status**: Work In Progress
 
-## Design and Concepts
+**License**: GPLv2+
 
-The simplest accepted input is a URL, e.g. https://www.bilibili.com/video/av8888888 . This Web page is itself a resource.
+## Design Goals
 
-Every resource is identified with a _Repository Resource Identifier_, which is a _stable_ counterpart of URL. For example, `bilibili:video:av12345` identifies a video found on Bilibili, and `bilibili:user:12345` identifies a user with UID 12345 on Bilibili. RRI is determined by the resource itself: even though bilibili changes its URLs frequently, this RRI should be always stable.
+- Easy to use as a command-line program, making it easy to integrate Repo into other applications.
+- Extensible plugin system to allow pre- and post-processing of data.
+- Two-way-sync among multiple devices with E2E encryption.
+- Stable ID, but mutable contents.
 
-Therefore, for each URL, which identifies a Web Page resource, there are potentially many associated resources. For example, associated with https://www.bilibili.com/video/av8888888 is:
+## Concepts
 
-1. a web page snapshot
-2. a video
-3. danmaku
-4. comment section
+In Repo, each object is described by nothing but a unique ID. There are no directories or paths.
 
-Each will be identified with its own RRI.
+In its simplest form, a Repo store is a list of such IDs, and each ID is linked to a real file stored somewhere on your disk.
 
-Finally, your Repository is a multigraph induced by the "associated" relationship, where each multinode represents a resource.
+This simplest system is not user-friendly. You absolutely want to summarize a file's contents in its file name. Repo implements a much more general concept, called _attribute_. With Repo, you can associate an object with any number of attributes. For example, you can
 
-WIP: Each RRI can have potentially multiple versions, indexed by datetimes.
+1. get back file paths by adding an attribute called `path`
+2. adding information (artist, album, ...) to an MP3 file
 
-## License
-
-GPLv3, unless stated otherwise.
+On top of that, Repo allows you do fast queries on your database. For example, you can list all of your MP3 files with a one-line command. Of course, a query can be as complex as you'd imagine.
